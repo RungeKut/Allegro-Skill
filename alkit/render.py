@@ -14,9 +14,11 @@
     не используется), дуги проводников — тоже отрезками;
   * площадки выводов — габаритом вывода (bbox), а не формой площадки;
   * вид снизу отражён по X — как если перевернуть плату.
-Нужна библиотека Pillow (ставит tools/setup.ps1).
+Нужна библиотека Pillow (knowledge/40_СРЕДА/40-01).
 """
 import os
+
+from .env import need_pil
 
 SIDES = ("top", "bottom", "all")
 
@@ -59,6 +61,7 @@ def _etch_color(layer, order):
 def png(board, out, side="top", width=1600, labels=True, drc=True,
         title=None):
     """Нарисовать плату в PNG. side: top / bottom / all. Возвращает путь."""
+    need_pil()
     from PIL import Image, ImageDraw
     if side not in SIDES:
         raise ValueError("side: %s" % ", ".join(SIDES))

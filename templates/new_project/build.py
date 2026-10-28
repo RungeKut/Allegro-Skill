@@ -3,22 +3,24 @@
 проверить снова, выгрузить файлы. Данные — в params.py.
 
 Запуск:  python build.py
+
+Скопировав шаблон в папку проекта, впишите в KIT корень набора allegro —
+папку, из которой прочитан его SKILL.md.
 """
 import os
 import sys
 
+KIT = r""
+
 
 def kit_root():
-    """Корень Allegro-Kit: ALKIT_HOME, иначе junction скилла."""
-    env = os.environ.get("ALKIT_HOME")
-    if env and os.path.isdir(os.path.join(env, "alkit")):
-        return env
-    link = os.path.join(os.path.expanduser("~"), ".claude", "skills",
-                        "allegro")
-    root = os.path.dirname(os.path.realpath(link))
-    if os.path.isdir(os.path.join(root, "alkit")):
-        return root
-    raise RuntimeError("Allegro-Kit не найден: запустите tools/setup.ps1")
+    """Корень набора allegro: KIT, иначе набор, в котором лежит этот файл."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    for cand in (KIT, os.path.dirname(os.path.dirname(here))):
+        if cand and os.path.isdir(os.path.join(cand, "alkit")):
+            return cand
+    raise RuntimeError("набор allegro не найден: впишите в KIT (build.py) "
+                       "папку, из которой прочитан SKILL.md набора")
 
 
 sys.path.insert(0, kit_root())

@@ -238,6 +238,7 @@ class Live:
     def snapshot(hwnd, path):
         """Снимок окна в PNG (PrintWindow). Для диалогов — чтобы прочитать
         вопрос. Холст платы так не снимается: выходит белым."""
+        env.need_pil()
         from PIL import Image
         gdi32 = ctypes.windll.gdi32
         r = wt.RECT()

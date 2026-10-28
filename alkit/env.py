@@ -176,5 +176,15 @@ def skill_path(path):
 
 
 def kit_root():
-    """Корень набора (папка, где лежат alkit/, knowledge/, skill/)."""
+    """Корень набора (папка, где лежат SKILL.md, alkit/, knowledge/)."""
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def need_pil():
+    """Pillow ставится руками (knowledge/40_СРЕДА/40-01); без него —
+    понятная ошибка с командой установки, а не голый ImportError."""
+    try:
+        import PIL  # noqa: F401
+    except ImportError:
+        raise RuntimeError("нужен Pillow: python -m pip install --user Pillow "
+                           "(knowledge/40_СРЕДА/40-01)") from None

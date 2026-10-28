@@ -27,7 +27,7 @@ knowledge/INDEX.md).
 Единицы — единицы платы (Board.units); набор их не переводит.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .env import (cdsroot, is_safe_path, kit_root, product_order, products,
                   tool, utf8_console, version, work_root)

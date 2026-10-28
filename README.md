@@ -1,16 +1,17 @@
-# Allegro-Kit
+# Allegro-Skill
 
 Инструмент для работы с печатными платами Cadence Allegro и схемами
 OrCAD Capture скриптами: библиотека на Python, база проверенного знания и
-правила её ведения. Подключается к Claude Code как скилл `/allegro` и к
-Kimi Code как `/skill:allegro`.
+правила её ведения. Клон репозитория и есть папка скилла: Claude Code
+видит его как `/allegro`, Kimi Code — как `/skill:allegro`.
 
-Соседний набор для SolidWorks — [SolidWorks-Kit](https://github.com/RungeKut/SolidWorks-Kit);
-правила ведения у них общие.
+Общие правила ведения, проверки и хук — соседний скилл
+[Skill-Skill](https://github.com/RungeKut/Skill-Skill); соседний набор для
+SolidWorks — [SolidWorks-Skill](https://github.com/RungeKut/SolidWorks-Skill).
 
 ```
-Allegro-Kit/
-├── skill/SKILL.md        точка входа для ИИ (подключён как скилл)
+allegro/                  клон Allegro-Skill в папке скиллов агента
+├── SKILL.md              точка входа для ИИ
 ├── alkit/                библиотека Python
 │   ├── skill/alkit.il    SKILL-часть: выгрузка, правка, задание
 │   └── tcl/dsn_dump.tcl  выгрузка схемы Capture
@@ -20,8 +21,8 @@ Allegro-Kit/
 │   ├── 10_API/  20_ПРИЁМЫ/  30_ГРАБЛИ/  40_СРЕДА/
 ├── templates/new_project/ скелет проекта
 ├── tests/                сквозные проверки на демо-платах Cadence
-├── tools/setup.ps1       установка на машине
-├── tools/check_docs.py   проверка целостности базы и стоп-слов
+├── tools/check_docs.py   проверка (обёртка общей из skill-skill)
+├── tools/kit_local.py    особое набора для проверки
 └── CHANGELOG.md
 ```
 
@@ -43,35 +44,26 @@ Allegro-Kit/
 
 ## Установка на новой машине
 
-```powershell
-git clone https://github.com/RungeKut/Allegro-Kit.git
-cd Allegro-Kit
-powershell -ExecutionPolicy Bypass -File tools\setup.ps1
+```bash
+git clone https://github.com/RungeKut/Allegro-Skill.git "<папка скиллов агента>/allegro"
+python -m pip install --user Pillow
 ```
 
-Либо двойной щелчок по `Install-skill.bat`.
-
-Скрипт создаёт junction `~\.claude\skills\allegro` (Claude Code) и
-`~\.kimi-code\skills\allegro` (Kimi Code) -> `<репозиторий>\skill`,
-прописывает `ALKIT_HOME`, включает хук на текст коммита, заводит
-локальный стоп-лист, проверяет Python (**64-bit**), ставит Pillow и
-находит Cadence. Прав администратора не требует. После установки —
-**перезапустить Claude Code / Kimi Code**.
-
-Перезапуск нужен один раз — чтобы агент зарегистрировал скилл. Дальше
-обновления набора (`git pull`) перезапуска не требуют: база знаний,
-библиотека и тело SKILL.md читаются с диска в момент использования.
-Перезапуск понадобится, только если поменялся frontmatter SKILL.md —
-имя или description с триггерами.
+Имя папки — `allegro` (как `name` в `SKILL.md`); рядом нужен скилл
+skill-skill. Настройка клона (хук, автор, стоп-лист) — skill-skill,
+`knowledge/40_СРЕДА/40-01`; зависимости и проверка окружения —
+`knowledge/40_СРЕДА/40-01` здесь. Несколько агентов — по клону в папку
+скиллов каждого. Обновление — `git pull`; Claude Code подхватывает его
+без перезапуска, другие агенты — не проверено.
 
 Нужны: Cadence SPB с Allegro PCB Editor (проверено на 17.2-2016 S066) и
-лицензия уровня, в котором есть SKILL; Python 3.11+ 64-bit.
+лицензия уровня, в котором есть SKILL; Python 3.11+ 64-bit; Pillow.
 
 ## Быстрый старт
 
 ```python
-import os, sys
-sys.path.insert(0, os.environ["ALKIT_HOME"])   # ставит tools/setup.ps1
+import sys
+sys.path.insert(0, r"<папка скиллов агента>llegro")   # корень набора
 import alkit as ak
 
 ak.utf8_console()
@@ -86,8 +78,9 @@ ak.place(r"D:\проект\плата.brd", {"C11": (10.0, 20.0, 90, "top")},
          save_to=r"D:\проект\плата_v2.brd")
 ```
 
-Новый проект: скопировать `templates/new_project`, заменить данные в
-`params.py`, запустить `build.py`.
+Новый проект: скопировать `templates/new_project`, вписать в `KIT`
+(`build.py`) корень набора, заменить данные в `params.py`, запустить
+`build.py`.
 
 ## Как обратиться к набору
 
@@ -183,13 +176,11 @@ python tools\check_docs.py      целостность базы знаний
 
 В начале — `git pull --rebase`; после каждой правки набора — `git diff`,
 `python tools/check_docs.py --project "<папка проекта>"`, коммит, `git
-push`. Без права записи правка уходит pull request'ом из своего форка;
-владелец разбирает открытые PR при каждом pull (`gh pr list`). Порядок —
-`knowledge/40_СРЕДА/40-02`. **В набор не попадает ничего о
-проектируемом изделии** — ни в файлы, ни в текст коммита. Приметы изделия — в `tools/stoplist.txt`: он
-локальный (`.gitignore`), его заводит `setup.ps1`, и в репозиторий он не
-уходит. Автор коммитов задаётся для клона публичным именем, а не берётся
-из глобальных рабочих настроек git. Подробности — `knowledge/40_СРЕДА/40-02`.
+push` сразу. Без права записи правка уходит pull request'ом из своего
+форка; сливает только владелец. **В набор не попадает ничего о
+проектируемом изделии** — ни в файлы, ни в текст коммита; приметы изделия
+— в локальный стоп-лист. Общие правила — skill-skill, 40-02; особенности
+набора — `knowledge/40_СРЕДА/40-02`.
 
 ---
 

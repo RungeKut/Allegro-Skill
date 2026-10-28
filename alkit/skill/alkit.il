@@ -1,4 +1,4 @@
-; alkit.il — SKILL-часть набора Allegro-Kit.
+; alkit.il — SKILL-часть набора Allegro-Skill.
 ;
 ; Загружается перед каждым заданием — и в пакетном режиме (allegro -nographic),
 ; и в живом (WM_COPYDATA в запущенный Allegro). Все имена начинаются с ak,
