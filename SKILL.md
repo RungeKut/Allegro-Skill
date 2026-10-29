@@ -1,31 +1,27 @@
 ---
 name: allegro
-description: "Печатные платы в Cadence Allegro и схемы OrCAD Capture скриптами — чтение и правка платы (.brd) без окна и в открытом Allegro, расстановка компонентов, выгрузка компонентов, выводов, цепей, проводников и полигонов, картинка платы, DRC, неразведённые связи, отчёты, Gerber, IPC-2581, STEP, PDF, чтение схемы (.dsn) без Capture и сверка схемы с платой. Используй ВСЕГДА, когда речь об Allegro, Cadence, OrCAD, Capture, PCB Editor, SKILL/AXL, файлах .brd/.dsn/.dra/.opj; когда просят посмотреть, проверить, разобрать, расставить, переместить, повернуть компоненты платы, сверить схему с платой, найти расхождения, выгрузить перечень элементов, Gerber, STEP или IPC-2581 платы; а также при ошибках «No licenses available», «Failed to open design since it is locked», «Starting new design», «*Error* eval: undefined function», падении allegro.exe с кодом -1073741819. Содержит библиотеку alkit и базу проверенного опытом знания."
+description: "Печатные платы в Cadence Allegro и схемы OrCAD Capture скриптами — чтение и правка платы (.brd) без окна и в открытом Allegro, расстановка компонентов, выгрузка компонентов, выводов, цепей, проводников и полигонов, картинка платы, DRC, неразведённые связи, отчёты, Gerber, IPC-2581, STEP, PDF, чтение схемы (.dsn) без Capture и сверка схемы с платой. Используй ВСЕГДА, когда речь об Allegro, Cadence, OrCAD, Capture, PCB Editor, SKILL/AXL, файлах .brd/.dsn/.dra/.opj; когда просят посмотреть, проверить, расставить, переместить или повернуть компоненты платы, сверить схему с платой, выгрузить перечень элементов; а также при ошибках «No licenses available», «Failed to open design since it is locked», «Starting new design», «*Error* eval: undefined function», падении allegro.exe с кодом -1073741819."
 ---
 
 # Allegro и Capture: платы и схемы скриптами
 
-Корень набора — папка, из которой прочитан этот файл (клон
-`RungeKut/Allegro-Skill`). База `knowledge/`: карта и поиск по симптому —
-`INDEX.md`, пути к Allegro и состав `alkit` — 10-06. Общие правила —
-соседний скилл skill-skill.
+Корень набора — папка этого файла (клон `RungeKut/Allegro-Skill`). База
+`knowledge/`: карта и поиск по симптому — `INDEX.md`, пути к Allegro, состав
+`alkit`, новый проект — 10-06. Общие правила — соседний скилл skill-skill.
 
-**Первым делом:** `git -C <корень> pull --rebase`; конфликт — разобрать
-до работы. База собрана на Cadence SPB 17.2-S066: на другой версии
-«проверено» читать как «не проверено» (00).
+**Первым делом:** `git -C <корень> pull --rebase`. База — Cadence SPB
+17.2-S066: на другой версии «проверено» читать как «не проверено» (00).
 
 ```python
-import sys
-sys.path.insert(0, r"<корень>")
+import sys; sys.path.insert(0, r"<корень>")
 import alkit as ak
-ak.utf8_console()          # иначе print с кириллицей упадёт
+ak.utf8_console()  # иначе print с кириллицей упадёт
 print(ak.version(), ak.product_order())
 ```
 
 Плата без окна — `ak.dump`, `ak.place`, `ak.run`; открытая — `ak.Live()`;
 отчёты, экспорт — `ak.summary`, `ak.gerber`…; схема — `ak.read_dsn`,
-`ak.compare`. Новый проект — `templates/new_project` (в `build.py`
-вписать `KIT`).
+`ak.compare`.
 
 ## Железные правила
 
@@ -39,10 +35,6 @@ print(ak.version(), ak.product_order())
 6. Непроверенное не выдавать за проверенное.
 7. В набор, коммит и PR — ничего об изделии: ни названий и номеров, ни
    цепей, компонентов, чисел и картинок платы (40-02).
-
-## Правка набора
-
-Нашли грабли — запись по `knowledge/00_ПРАВИЛА.md`, строки в `INDEX.md` и
-`CHANGELOG.md`; полезная функция — в `alkit`. Затем
-`python tools/check_docs.py --project "<папка проекта>"`, `git diff`,
-коммит, push сразу. Установка и зависимости — 40-01.
+8. Грабли — запись по `knowledge/00_ПРАВИЛА.md`, строки в `INDEX.md` и
+   `CHANGELOG.md`, функция — в `alkit`; дальше — порядок правки
+   skill-skill. Установка — 40-01.
