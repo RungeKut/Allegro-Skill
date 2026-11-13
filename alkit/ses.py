@@ -113,8 +113,12 @@ class Session:
         with io.open(path, encoding=encoding, errors="replace") as f:
             return cls(f.read())
 
-    def to_skill(self):
-        """SKILL-код импорта: пути и переходные; возвращает (код, счётчики)."""
+    def to_skill(self, via_pad=None):
+        """SKILL-код импорта: пути и переходные; возвращает (код, счётчики).
+
+        via_pad — заменить падстек всех переходных (если сессия ссылается
+        на переходную, которой нет в плате-приёмнике).
+        """
         lines = ["n_w = 0", "n_v = 0"]
         for name, layer, width, pts in self.wires:
             s = " ".join("%.4f:%.4f" % p for p in pts)
@@ -122,17 +126,19 @@ class Session:
             lines.append('when(axlDBCreatePath(p "%s" "%s") n_w = n_w + 1)'
                          % (ETCH.format(layer), name))
         for name, pad, x, y in self.vias:
+            if via_pad:
+                pad = via_pad
             lines.append('when(axlDBCreateVia("%s" %.4f:%.4f "%s") '
                          "n_v = n_v + 1)" % (pad, x, y, name))
         lines.append('fprintf(akPort "wires=%L vias=%L\\n" n_w n_v)')
         return "\n".join(lines) + "\n", len(self.wires), len(self.vias)
 
 
-def import_session(ses_path, board, save_to, timeout=900):
+def import_session(ses_path, board, save_to, timeout=900, via_pad=None):
     """Залить сессию в плату; возвращает Result alkit и счётчики."""
     from . import batch
     ses = Session.from_file(ses_path)
-    il, nw, nv = ses.to_skill()
+    il, nw, nv = ses.to_skill(via_pad=via_pad)
     r = batch.run(board, il, save_to=save_to,
                   outputs=["port.txt"], timeout=timeout)
     return r, ses
